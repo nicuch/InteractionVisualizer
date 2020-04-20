@@ -20,11 +20,13 @@ public class PlayerRangeManager {
 	public static boolean hasPlayerNearby(Location location) {
 		String world = location.getWorld().getUID().toString();
 		int x = (int) Math.floor((double) location.getBlockX() / 16.0);
-		int z = (int) Math.floor((double) location.getBlockZ() / 16.0);
+		int z = (int) Math.floor((double) location.getBlockZ() / 16.0);		
 		Object[] array = new Object[]{world, x, z};
 		synchronized (current) {
 			if (current.stream().anyMatch(each -> Arrays.equals(each, array))) {
-				return true;
+				if (location.getWorld().isChunkLoaded(x, z)) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -60,7 +62,7 @@ public class PlayerRangeManager {
 				upcomming = new HashSet<Object[]>();
 			} finally {
 				if (plugin.isEnabled()) {
-					Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> run(), 1);
+					Bukkit.getScheduler().runTaskLater(plugin, () -> run(), 1);
 				}
 			}
 		});
